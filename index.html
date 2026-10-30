@@ -82,36 +82,39 @@
 
             frameImg.onload = () => {
                 userImg.onload = () => {
+                    // Set dimensi canvas sesuai ukuran frame asli kamu agar HD
                     canvas.width = frameImg.width;
                     canvas.height = frameImg.height;
 
-                    // Pengaturan area penempatan gambar screenshot di dalam kotak hitam
-                    const screenshotLebar = frameImg.width * 0.70; 
-                    const screenshotTinggi = frameImg.height * 0.45; 
+                    /* 
+                       PERBAIKAN UKURAN DAN POSISI:
+                       Disisipkan di bawah agar pas masuk ke dalam kotak hitam besar bingkai kamu
+                    */
+                    const screenshotLebar = frameImg.width * 0.505; 
+                    const screenshotTinggi = frameImg.height * 0.455; 
                     const posX = (frameImg.width - screenshotLebar) / 2; 
-                    const posY = frameImg.height * 0.23; 
+                    const posY = frameImg.height * 0.231; 
 
-                    // Lapisan 1: Screenshot bukti vote di paling bawah
+                    // Lapisan 1: Screenshot bukti vote milik user (di bawah frame)
                     ctx.drawImage(userImg, posX, posY, screenshotLebar, screenshotTinggi);
 
-                    // Lapisan 2: Bingkai merah buatanmu di atas gambar screenshot
+                    // Lapisan 2: Bingkai merah buatanmu (di atas gambar screenshot)
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
-                    // Lapisan 3: Cetak Teks Username tepat di atas selotip merah
+                    // Lapisan 3: Cetak Teks Username tepat di atas selotip merah kamu
                     const username = usernameInput.value.trim() || '@ARMY';
-                    
                     ctx.font = `bold ${frameImg.width * 0.035}px 'Segoe UI', Arial`; 
                     ctx.fillStyle = '#ffffff'; 
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)'; 
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; 
                     ctx.shadowBlur = 4;
                     
-                    // Koordinat Y pas di atas pita/selotip merah gambar kamu
+                    // Posisi koordinat Y disesuaikan agar pas di tengah selotip merah
                     ctx.fillText(username, frameImg.width / 2, frameImg.height * 0.555);
 
-                    // Tampilkan gambar instan
+                    // Tampilkan hasil akhir gambar instan
                     const finalDataUrl = canvas.toDataURL('image/png');
                     previewImg.src = finalDataUrl;
                     
