@@ -74,33 +74,62 @@
         const ctx = canvas.getContext('2d');
 
         imageUpload.addEventListener('change', () => {
-            if (imageUpload.files[0]) {
+            if (imageUpload.files.length > 0) {
                 uploadStatus.innerText = "✓ File Berhasil Dipilih";
                 uploadStatus.style.color = "#10b981";
             }
         });
 
         generateBtn.addEventListener('click', () => {
-            if (!imageUpload.files[0]) { alert('Unggah screenshot bukti voting dulu!'); return; }
+            if (imageUpload.files.length === 0) { alert('Unggah screenshot bukti voting dulu!'); return; }
             const userImg = new Image(), frameImg = new Image();
             userImg.src = URL.createObjectURL(imageUpload.files[0]);
             frameImg.src = 'frame.png';
 
             frameImg.onload = () => {
                 userImg.onload = () => {
-                    canvas.width = frameImg.width; canvas.height = frameImg.height;
-                    const w = frameImg.width * 0.505, h = frameImg.height * 0.455;
-                    const x = (frameImg.width - w) / 2, y = frameImg.height * 0.231;
+                    // 1. Samakan ukuran canvas dengan resolusi asli gambar tiket kamu
+                    canvas.width = frameImg.width; 
+                    canvas.height = frameImg.height;
 
-                    ctx.drawImage(userImg, x, y, w, h);
+                    // 2. Tentukan koordinat kotak hitam lubang tengah
+                    const targetW = frameImg.width * 0.505;
+                    const targetH = frameImg.height * 0.455;
+                    const targetX = (frameImg.width - targetW) / 2;
+                    const targetY = frameImg.height * 0.231;
+
+                    // 3. Simpan state awal canvas
+                    ctx.save();
+
+                    // 4. Buat area pemotongan (clipping mask) seukuran kotak hitam
+                    ctx.beginPath();
+                    ctx.rect(targetX, targetY, targetW, targetH);
+                    ctx.clip();
+
+                    // 5. Hitung perbandingan skala gambar agar screenshot menutupi area tengah secara proporsional (object-fit: cover)
+                    const scale = Math.max(targetW / userImg.width, targetH / userImg.height);
+                    const drawW = userImg.width * scale;
+                    const drawH = userImg.height * scale;
+                    const drawX = targetX + (targetW - drawW) / 2;
+                    const drawY = targetY + (targetH - drawH) / 2;
+
+                    // 6. Gambar bukti voting di dalam topeng potongan
+                    ctx.drawImage(userImg, drawX, drawY, drawW, drawH);
+
+                    // 7. Kembalikan fungsi canvas normal
+                    ctx.restore();
+
+                    // 8. Tempel gambar bingkai kustom di atasnya
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
+                    // 9. Cetak Watermark Username
                     const user = usernameInput.value.trim() || '@ARMY';
                     ctx.font = `bold ${frameImg.width * 0.035}px 'Inter', sans-serif`;
                     ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                     ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 4;
                     ctx.fillText(user, frameImg.width / 2, frameImg.height * 0.555);
 
+                    // Tampilkan hasil akhir
                     previewImg.src = canvas.toDataURL('image/png');
                     placeholderText.classList.add('hidden');
                     previewImg.classList.remove('hidden');
