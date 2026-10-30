@@ -91,16 +91,30 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // Ukuran lubang kotak tengah bingkai
+                    // Ukuran lubang tengah bingkai tiket merah kamu
                     const targetW = frameImg.width * 0.525;
                     const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // Gambar screenshot ditarik paksa memenuhi ukuran kotak (tanpa menyisakan celah samping)
-                    ctx.drawImage(userImg, targetX, targetY, targetW, targetH);
+                    // Buat pembatas topeng potong (clipping mask) agar tidak luber keluar bingkai
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.rect(targetX, targetY, targetW, targetH);
+                    ctx.clip();
 
-                    // Lapisan atas: Pasang gambar bingkai utama
+                    // FIX UTAMA: Kunci lebar 100% mengikuti kotak hitam, biarkan memanjang ke bawah
+                    const scaleWidth = targetW / userImg.width;
+                    const drawW = targetW;
+                    const drawH = userImg.height * scaleWidth;
+                    const drawX = targetX;
+                    const drawY = targetY; // Dimulai tepat dari bagian atas sertifikat
+
+                    // Gambar isi bukti voting di dalam topeng potongan
+                    ctx.drawImage(userImg, drawX, drawY, drawW, drawH);
+                    ctx.restore();
+
+                    // Lapisan depan: Tempel gambar bingkai tiket merah utama
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
                     // Cetak teks nama di atas pita merah
