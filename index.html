@@ -89,7 +89,9 @@
             const userImg = new Image();
             const frameImg = new Image();
             
+            // PENGAMAN UTAMA: Mengizinkan aset lokal digabungkan ke canvas tanpa diblokir CORS browser
             frameImg.crossOrigin = 'anonymous'; 
+            
             userImg.src = URL.createObjectURL(imageUpload.files);
             frameImg.src = 'frame.png'; 
 
@@ -98,16 +100,16 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // KOORDINAT BARU: Diperlebar agar menutup celah abu-abu di pinggiran tengah
-                    const targetW = frameImg.width * 0.555;
-                    const targetH = frameImg.height * 0.464;
+                    // Ukuran lubang kotak tengah bingkai tiket merah kamu
+                    const targetW = frameImg.width * 0.525;
+                    const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
-                    const targetY = frameImg.height * 0.226;
+                    const targetY = frameImg.height * 0.228;
 
-                    // Menggambar screenshot sertifikat di lapisan belakang
+                    // Menggunakan sistem penarikan murni (Stretch) tanpa potong agar menutup 100% rapat
                     ctx.drawImage(userImg, targetX, targetY, targetW, targetH);
 
-                    // Menggambar bingkai frame.png di lapisan depan
+                    // Lapisan depan: Tempel gambar bingkai tiket merah utama
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
                     // Cetak teks nama di atas pita merah
