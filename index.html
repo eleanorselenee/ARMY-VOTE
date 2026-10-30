@@ -53,7 +53,7 @@
 
     <button id="generateBtn" class="btn">✨ Generate Gambar</button>
 
-    <!-- LANGKAH 3 (Hasil Preview & Download) -->
+    <!-- LANGKAH 3 -->
     <div class="card">
         <div class="title"><div class="num">3</div>Your Overlay</div>
         <p class="desc">Sertifikat kustom yang sudah rapi akan muncul di bawah ini.</p>
@@ -89,8 +89,10 @@
             const userImg = new Image();
             const frameImg = new Image();
             
-            userImg.src = URL.createObjectURL(imageUpload.files[0]);
-            // Sistem akan langsung menembak file 'frame.png' bawaan di repositori GitHub kamu
+            // PENGAMAN UTAMA: Mengizinkan aset lokal digabungkan ke canvas tanpa diblokir CORS browser
+            frameImg.crossOrigin = 'anonymous'; 
+            
+            userImg.src = URL.createObjectURL(imageUpload.files);
             frameImg.src = 'frame.png'; 
 
             frameImg.onload = () => {
@@ -117,16 +119,21 @@
                     ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 4;
                     ctx.fillText(user, frameImg.width / 2, frameImg.height * 0.555);
 
-                    previewImg.src = canvas.toDataURL('image/png');
-                    placeholderText.classList.add('hidden');
-                    previewImg.classList.remove('hidden');
-                    downloadBtn.classList.remove('hidden');
+                    try {
+                        previewImg.src = canvas.toDataURL('image/png');
+                        placeholderText.classList.add('hidden');
+                        previewImg.classList.remove('hidden');
+                        downloadBtn.classList.remove('hidden');
 
-                    downloadBtn.onclick = () => {
-                        const l = document.createElement('a');
-                        l.download = `ARMY_VOTE_${user}.png`;
-                        l.href = previewImg.src; l.click();
-                    };
+                        downloadBtn.onclick = () => {
+                            const l = document.createElement('a');
+                            l.download = `ARMY_VOTE_${user}.png`;
+                            l.href = previewImg.src; l.click();
+                        };
+                    } catch (err) {
+                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah di-upload ke GitHub.");
+                        console.error(err);
+                    }
                 };
             };
         });
