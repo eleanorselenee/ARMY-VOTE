@@ -89,7 +89,9 @@
             const userImg = new Image();
             const frameImg = new Image();
             
+            // ATURAN WAJIB: Atur crossOrigin sebelum src dipasang agar browser tidak memblokir canvas
             frameImg.crossOrigin = 'anonymous'; 
+            
             userImg.src = URL.createObjectURL(imageUpload.files);
             frameImg.src = 'frame.png'; 
 
@@ -98,16 +100,19 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // KOORDINAT BARU: Diperlebar agar menutup celah abu-abu di pinggiran tengah
-                    const targetW = frameImg.width * 0.555;
-                    const targetH = frameImg.height * 0.464;
+                    // UKURAN FIX: Diperlebar signifikan ke kiri-kanan dan disesuaikan tingginya agar menutup pinggiran abu-abu
+                    const targetW = frameImg.width * 0.556;
+                    const targetH = frameImg.height * 0.468;
                     const targetX = (frameImg.width - targetW) / 2;
-                    const targetY = frameImg.height * 0.226;
+                    const targetY = frameImg.height * 0.224;
 
-                    // Menggambar screenshot sertifikat di lapisan belakang
+                    // Bersihkan canvas lama
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Gambar screenshot di belakang
                     ctx.drawImage(userImg, targetX, targetY, targetW, targetH);
 
-                    // Menggambar bingkai frame.png di lapisan depan
+                    // Gambar bingkai tiket merah di depan
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
                     // Cetak teks nama di atas pita merah
@@ -129,10 +134,14 @@
                             l.href = previewImg.src; l.click();
                         };
                     } catch (err) {
-                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah di-upload ke GitHub.");
+                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah di-upload di folder yang sama.");
                         console.error(err);
                     }
                 };
+            };
+            
+            frameImg.onerror = () => {
+                alert("File 'frame.png' tidak ditemukan! Pastikan nama file di GitHub benar-benar 'frame.png' (huruf kecil semua) dan satu folder dengan file HTML ini.");
             };
         });
     </script>
