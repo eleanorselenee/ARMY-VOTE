@@ -1,1 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTS ARMY MAMA 2026 Vote Generator</title>
+    <script src="https://jsdelivr.net"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e0b36 0%, #0f051d 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
 
+    <div class="w-full max-w-md bg-[#25153a] rounded-2xl shadow-2xl border border-[#4a287a] p-6 text-center">
+        <!-- Header -->
+        <h1 class="text-2xl font-bold tracking-wider text-[#b18ee6] mb-1">ARMY VOTE PARTY</h1>
+        <p class="text-xs text-gray-400 mb-6">Bikin bukti voting MAMA 2026 kamu jadi makin keren!</p>
+
+        <!-- Form Input -->
+        <div class="space-y-4 text-left">
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">1. Masukkan Username Sosial Media</label>
+                <input type="text" id="usernameInput" placeholder="Contoh: @eleanorselenee" 
+                    class="w-full px-4 py-2.5 bg-[#170b26] border border-[#5c3399] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#9356f7]">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">2. Unggah Screenshot Vote Mnet Plus</label>
+                <input type="file" id="imageUpload" accept="image/*" 
+                    class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-[#5c3399] file:text-white hover:file:bg-[#7342bf] cursor-pointer">
+            </div>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="mt-6 space-y-2">
+            <button id="generateBtn" class="w-full bg-[#8247e5] hover:bg-[#975eff] text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-lg cursor-pointer">
+                ✨ Generate Gambar
+            </button>
+            <button id="downloadBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-lg hidden cursor-pointer">
+                💾 Download Hasil
+            </button>
+        </div>
+
+        <!-- Area Preview Khusus Hasil Akhir -->
+        <div class="mt-6 border-t border-[#3d2066] pt-6">
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Pratinjau Hasil</h3>
+            <div class="flex justify-center bg-[#170b26] p-2 rounded-xl border border-[#3d2066]">
+                <canvas id="canvas" class="hidden"></canvas>
+                <img id="previewImg" src="" alt="Hasil akan muncul di sini setelah klik Generate" class="max-w-full h-auto rounded-lg text-sm text-gray-500 italic py-8">
+            </div>
+        </div>
+    </div>
+
+    <p class="text-xs text-gray-500 mt-4">Template desain oleh @eleanorselenee</p>
+
+    <script>
+        const imageUpload = document.getElementById('imageUpload');
+        const usernameInput = document.getElementById('usernameInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const canvas = document.getElementById('canvas');
+        const previewImg = document.getElementById('previewImg');
+        const ctx = canvas.getContext('2d');
+
+        const FRAME_SRC = 'frame.png'; 
+
+        generateBtn.addEventListener('click', () => {
+            if (!imageUpload.files[0]) {
+                alert('Tolong unggah screenshot bukti voting kamu terlebih dahulu!');
+                return;
+            }
+
+            const userImg = new Image();
+            const frameImg = new Image();
+            
+            userImg.src = URL.createObjectURL(imageUpload.files[0]);
+            frameImg.src = FRAME_SRC;
+
+            frameImg.onload = () => {
+                userImg.onload = () => {
+                    canvas.width = frameImg.width;
+                    canvas.height = frameImg.height;
+
+                    // Pengaturan area penempatan gambar screenshot di dalam kotak hitam
+                    const screenshotLebar = frameImg.width * 0.70; 
+                    const screenshotTinggi = frameImg.height * 0.45; 
+                    const posX = (frameImg.width - screenshotLebar) / 2; 
+                    const posY = frameImg.height * 0.23; 
+
+                    // Lapisan 1: Screenshot bukti vote di paling bawah
+                    ctx.drawImage(userImg, posX, posY, screenshotLebar, screenshotTinggi);
+
+                    // Lapisan 2: Bingkai merah buatanmu di atas gambar screenshot
+                    ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
+
+                    // Lapisan 3: Cetak Teks Username tepat di atas selotip merah
+                    const username = usernameInput.value.trim() || '@ARMY';
+                    
+                    ctx.font = `bold ${frameImg.width * 0.035}px 'Segoe UI', Arial`; 
+                    ctx.fillStyle = '#ffffff'; 
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)'; 
+                    ctx.shadowBlur = 4;
+                    
+                    // Koordinat Y pas di atas pita/selotip merah gambar kamu
+                    ctx.fillText(username, frameImg.width / 2, frameImg.height * 0.555);
+
+                    // Tampilkan gambar instan
+                    const finalDataUrl = canvas.toDataURL('image/png');
+                    previewImg.src = finalDataUrl;
+                    
+                    downloadBtn.classList.remove('hidden');
+                    downloadBtn.onclick = () => {
+                        const link = document.createElement('a');
+                        link.download = `ARMY_VOTE_${username}.png`;
+                        link.href = finalDataUrl;
+                        link.click();
+                    };
+                };
+            };
+
+            frameImg.onerror = () => {
+                alert('Gagal memuat file "frame.png". Pastikan gambarmu sudah diunggah ke GitHub dengan nama file yang persis sama.');
+            };
+        });
+    </script>
+</body>
+</html>
