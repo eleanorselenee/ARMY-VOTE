@@ -83,7 +83,7 @@
         generateBtn.addEventListener('click', () => {
             if (imageUpload.files.length === 0) { alert('Unggah screenshot bukti voting dulu!'); return; }
             const userImg = new Image(), frameImg = new Image();
-            userImg.src = URL.createObjectURL(imageUpload.files[0]);
+            userImg.src = URL.createObjectURL(imageUpload.files);
             frameImg.src = 'frame.png';
 
             frameImg.onload = () => {
@@ -91,30 +91,19 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
+                    // Ukuran lubang kotak tengah bingkai
                     const targetW = frameImg.width * 0.525;
                     const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.rect(targetX, targetY, targetW, targetH);
-                    ctx.clip();
+                    // Gambar screenshot ditarik paksa memenuhi ukuran kotak (tanpa menyisakan celah samping)
+                    ctx.drawImage(userImg, targetX, targetY, targetW, targetH);
 
-                    const scale = Math.min(targetW / userImg.width, targetH / userImg.height);
-                    const drawW = userImg.width * scale;
-                    const drawH = userImg.height * scale;
-                    const drawX = targetX + (targetW - drawW) / 2;
-                    const drawY = targetY + (targetH - drawH) / 2;
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(targetX, targetY, targetW, targetH);
-
-                    ctx.drawImage(userImg, drawX, drawY, drawW, drawH);
-                    ctx.restore();
-
+                    // Lapisan atas: Pasang gambar bingkai utama
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
+                    // Cetak teks nama di atas pita merah
                     const user = usernameInput.value.trim() || '@ARMY';
                     ctx.font = `bold ${frameImg.width * 0.035}px 'Inter', sans-serif`;
                     ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
