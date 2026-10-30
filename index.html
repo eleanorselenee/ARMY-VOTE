@@ -3,59 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTS ARMY MAMA 2026 Vote Generator</title>
-    <script src="https://jsdelivr.net"></script>
+    <title>BTS ARMY VOTE</title>
+    <link href="https://googleapis.com" rel="stylesheet">
     <style>
-        body {
-            background: linear-gradient(135deg, #1e0b36 0%, #0f051d 100%);
-            color: #ffffff;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: #111; display: flex; flex-direction: column; align-items: center; padding: 16px; }
+        .banner { width: 100%; max-width: 440px; background: #ba181b; border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 16px; border: 2px dashed #fff; color: #fff; }
+        .banner h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px; }
+        .banner p { font-size: 12px; opacity: 0.9; }
+        .card { width: 100%; max-width: 440px; background: #fff; border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .title { display: flex; align-items: center; font-size: 15px; font-weight: 800; color: #ba181b; text-transform: uppercase; margin-bottom: 12px; }
+        .num { background: #111; color: #fff; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; margin-right: 10px; }
+        .desc { font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.4; }
+        input[type="text"] { width: 100%; padding: 12px 16px; border: 1.5px solid #111; border-radius: 30px; font-size: 14px; outline: none; }
+        .upload-box { background: #111; border: 1.5px dashed #ba181b; border-radius: 16px; padding: 24px; text-align: center; position: relative; }
+        .upload-box p { color: #fff; font-size: 13px; font-weight: 600; }
+        .file-hidden { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .btn { width: 100%; max-width: 440px; color: white; font-weight: 800; padding: 14px; border: none; border-radius: 30px; cursor: pointer; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; background: #ba181b; margin-bottom: 16px; }
+        .btn-down { background: #111; margin-top: 12px; }
+        .preview-box { width: 100%; background: #111; border-radius: 12px; padding: 8px; display: flex; justify-content: center; min-height: 120px; }
+        .preview-box p { color: #94a3b8; font-size: 12px; font-style: italic; text-align: center; padding: 20px; }
+        #previewImg { max-width: 100%; height: auto; border-radius: 10px; }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body>
 
-    <div class="w-full max-w-md bg-[#25153a] rounded-2xl shadow-2xl border border-[#4a287a] p-6 text-center">
-        <!-- Header -->
-        <h1 class="text-2xl font-bold tracking-wider text-[#b18ee6] mb-1">ARMY VOTE PARTY</h1>
-        <p class="text-xs text-gray-400 mb-6">Bikin bukti voting MAMA 2026 kamu jadi makin keren!</p>
+    <div class="banner">
+        <h1>BTS VOTE TOUR</h1>
+        <p>Hi, ARMY! Let's personalize your MAMA 2026 certificate.</p>
+    </div>
 
-        <!-- Form Input -->
-        <div class="space-y-4 text-left">
-            <div>
-                <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">1. Masukkan Username Sosial Media</label>
-                <input type="text" id="usernameInput" placeholder="Contoh: @eleanorselenee" 
-                    class="w-full px-4 py-2.5 bg-[#170b26] border border-[#5c3399] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#9356f7]">
-            </div>
+    <div class="card">
+        <div class="title"><div class="num">1</div>Your Username</div>
+        <p class="desc">Akan otomatis tercetak di atas selotip merah bingkai kustom kamu.</p>
+        <input type="text" id="usernameInput" placeholder="@yourusername">
+    </div>
 
-            <div>
-                <label class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">2. Unggah Screenshot Vote Mnet Plus</label>
-                <input type="file" id="imageUpload" accept="image/*" 
-                    class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-[#5c3399] file:text-white hover:file:bg-[#7342bf] cursor-pointer">
-            </div>
-        </div>
-
-        <!-- Tombol Aksi -->
-        <div class="mt-6 space-y-2">
-            <button id="generateBtn" class="w-full bg-[#8247e5] hover:bg-[#975eff] text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-lg cursor-pointer">
-                ✨ Generate Gambar
-            </button>
-            <button id="downloadBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl transition duration-200 shadow-lg hidden cursor-pointer">
-                💾 Download Hasil
-            </button>
-        </div>
-
-        <!-- Area Preview Khusus Hasil Akhir -->
-        <div class="mt-6 border-t border-[#3d2066] pt-6">
-            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Pratinjau Hasil</h3>
-            <div class="flex justify-center bg-[#170b26] p-2 rounded-xl border border-[#3d2066]">
-                <canvas id="canvas" class="hidden"></canvas>
-                <img id="previewImg" src="" alt="Hasil akan muncul di sini setelah klik Generate" class="max-w-full h-auto rounded-lg text-sm text-gray-500 italic py-8">
-            </div>
+    <div class="card">
+        <div class="title"><div class="num">2</div>Add Your Voting Proof</div>
+        <p class="desc">Gunakan screenshot lembar sertifikat resmi dari Mnet Plus.</p>
+        <div class="upload-box">
+            <p id="uploadStatus">Tap to choose a screenshot</p>
+            <input type="file" id="imageUpload" class="file-hidden" accept="image/*">
         </div>
     </div>
 
-    <p class="text-xs text-gray-500 mt-4">Template desain oleh @eleanorselenee</p>
+    <button id="generateBtn" class="btn">✨ Generate Gambar</button>
+
+    <div class="card">
+        <div class="title"><div class="num">3</div>Your Overlay</div>
+        <p class="desc">Sertifikat kustom yang sudah rapi akan muncul di bawah ini.</p>
+        <div class="preview-box">
+            <canvas id="canvas" class="hidden"></canvas>
+            <p id="placeholderText">Waiting for your proof...</p>
+            <img id="previewImg" src="" alt="" class="hidden">
+        </div>
+        <button id="downloadBtn" class="btn btn-down hidden">Save / Download</button>
+    </div>
 
     <script>
         const imageUpload = document.getElementById('imageUpload');
@@ -64,72 +69,49 @@
         const downloadBtn = document.getElementById('downloadBtn');
         const canvas = document.getElementById('canvas');
         const previewImg = document.getElementById('previewImg');
+        const placeholderText = document.getElementById('placeholderText');
+        const uploadStatus = document.getElementById('uploadStatus');
         const ctx = canvas.getContext('2d');
 
-        const FRAME_SRC = 'frame.png'; 
+        imageUpload.addEventListener('change', () => {
+            if (imageUpload.files[0]) {
+                uploadStatus.innerText = "✓ File Berhasil Dipilih";
+                uploadStatus.style.color = "#10b981";
+            }
+        });
 
         generateBtn.addEventListener('click', () => {
-            if (!imageUpload.files[0]) {
-                alert('Tolong unggah screenshot bukti voting kamu terlebih dahulu!');
-                return;
-            }
-
-            const userImg = new Image();
-            const frameImg = new Image();
-            
+            if (!imageUpload.files[0]) { alert('Unggah screenshot bukti voting dulu!'); return; }
+            const userImg = new Image(), frameImg = new Image();
             userImg.src = URL.createObjectURL(imageUpload.files[0]);
-            frameImg.src = FRAME_SRC;
+            frameImg.src = 'frame.png';
 
             frameImg.onload = () => {
                 userImg.onload = () => {
-                    // Set dimensi canvas sesuai ukuran frame asli kamu agar HD
-                    canvas.width = frameImg.width;
-                    canvas.height = frameImg.height;
+                    canvas.width = frameImg.width; canvas.height = frameImg.height;
+                    const w = frameImg.width * 0.505, h = frameImg.height * 0.455;
+                    const x = (frameImg.width - w) / 2, y = frameImg.height * 0.231;
 
-                    /* 
-                       PERBAIKAN UKURAN DAN POSISI:
-                       Disisipkan di bawah agar pas masuk ke dalam kotak hitam besar bingkai kamu
-                    */
-                    const screenshotLebar = frameImg.width * 0.505; 
-                    const screenshotTinggi = frameImg.height * 0.455; 
-                    const posX = (frameImg.width - screenshotLebar) / 2; 
-                    const posY = frameImg.height * 0.231; 
-
-                    // Lapisan 1: Screenshot bukti vote milik user (di bawah frame)
-                    ctx.drawImage(userImg, posX, posY, screenshotLebar, screenshotTinggi);
-
-                    // Lapisan 2: Bingkai merah buatanmu (di atas gambar screenshot)
+                    ctx.drawImage(userImg, x, y, w, h);
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
-                    // Lapisan 3: Cetak Teks Username tepat di atas selotip merah kamu
-                    const username = usernameInput.value.trim() || '@ARMY';
-                    ctx.font = `bold ${frameImg.width * 0.035}px 'Segoe UI', Arial`; 
-                    ctx.fillStyle = '#ffffff'; 
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; 
-                    ctx.shadowBlur = 4;
-                    
-                    // Posisi koordinat Y disesuaikan agar pas di tengah selotip merah
-                    ctx.fillText(username, frameImg.width / 2, frameImg.height * 0.555);
+                    const user = usernameInput.value.trim() || '@ARMY';
+                    ctx.font = `bold ${frameImg.width * 0.035}px 'Inter', sans-serif`;
+                    ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 4;
+                    ctx.fillText(user, frameImg.width / 2, frameImg.height * 0.555);
 
-                    // Tampilkan hasil akhir gambar instan
-                    const finalDataUrl = canvas.toDataURL('image/png');
-                    previewImg.src = finalDataUrl;
-                    
+                    previewImg.src = canvas.toDataURL('image/png');
+                    placeholderText.classList.add('hidden');
+                    previewImg.classList.remove('hidden');
                     downloadBtn.classList.remove('hidden');
+
                     downloadBtn.onclick = () => {
-                        const link = document.createElement('a');
-                        link.download = `ARMY_VOTE_${username}.png`;
-                        link.href = finalDataUrl;
-                        link.click();
+                        const l = document.createElement('a');
+                        l.download = `ARMY_VOTE_${user}.png`;
+                        l.href = previewImg.src; l.click();
                     };
                 };
-            };
-
-            frameImg.onerror = () => {
-                alert('Gagal memuat file "frame.png". Pastikan gambarmu sudah diunggah ke GitHub dengan nama file yang persis sama.');
             };
         });
     </script>
