@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BTS ARMY VOTE</title>
-    <link href="https://googleapis.com" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
         body { background-color: #111; display: flex; flex-direction: column; align-items: center; padding: 16px; }
         .banner { width: 100%; max-width: 440px; background: #ba181b; border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 16px; border: 2px dashed #fff; color: #fff; }
         .banner h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px; }
@@ -34,27 +33,21 @@
         <p>Hi, ARMY! Let's personalize your MAMA certificate.</p>
     </div>
 
-    <!-- INPUT 1: USERNAME -->
     <div class="card">
         <div class="title"><div class="num">1</div>Your Username</div>
-        <p class="desc">Akan otomatis tercetak di atas selotip merah bingkai kustom kamu.</p>
         <input type="text" id="usernameInput" placeholder="@yourusername">
     </div>
 
-    <!-- INPUT 2: BUKTI VOTE -->
     <div class="card">
         <div class="title"><div class="num">2</div>Add Your Voting Proof</div>
-        <p class="desc">Gunakan screenshot lembar sertifikat resmi dari Mnet Plus.</p>
         <div class="upload-box">
             <p id="uploadStatus">Tap untuk pilih Screenshot Bukti</p>
             <input type="file" id="imageUpload" class="file-hidden" accept="image/*">
         </div>
     </div>
 
-    <!-- INPUT 3: BINGKAI/FRAME (Solusi jitu untuk HP Android Offline) -->
     <div class="card">
         <div class="title"><div class="num">3</div>Upload Bingkai Kustom (frame.png)</div>
-        <p class="desc">Pilih file <b>frame.png</b> dari memori penyimpanan HP kamu.</p>
         <div class="upload-box" style="border-color: #111; background: #222;">
             <p id="frameStatus">Tap untuk pilih file frame.png</p>
             <input type="file" id="frameUpload" class="file-hidden" accept="image/*">
@@ -65,10 +58,9 @@
 
     <div class="card">
         <div class="title"><div class="num">4</div>Your Overlay</div>
-        <p class="desc">Sertifikat kustom yang sudah rapi akan muncul di bawah ini.</p>
         <div class="preview-box">
             <canvas id="canvas" class="hidden"></canvas>
-            <p id="placeholderText">Waiting for your proof and frame...</p>
+            <p id="placeholderText">Menunggu foto bukti dan bingkai...</p>
             <img id="previewImg" src="" alt="" class="hidden">
         </div>
         <button id="downloadBtn" class="btn btn-down hidden">Save / Download</button>
@@ -87,80 +79,61 @@
         const frameStatus = document.getElementById('frameStatus');
         const ctx = canvas.getContext('2d');
 
-        // Indikator upload gambar bukti
         imageUpload.addEventListener('change', () => {
-            if (imageUpload.files && imageUpload.files[0]) {
+            if (imageUpload.files.length > 0) {
                 uploadStatus.innerText = "✓ Bukti Vote Terpilih";
                 uploadStatus.style.color = "#10b981";
             }
         });
 
-        // Indikator upload gambar frame
         frameUpload.addEventListener('change', () => {
-            if (frameUpload.files && frameUpload.files[0]) {
-                frameStatus.innerText = "✓ Bingkai Frame Terpilih";
+            if (frameUpload.files.length > 0) {
+                frameStatus.innerText = "✓ Bingkai Terpilih";
                 frameStatus.style.color = "#10b981";
             }
         });
 
         generateBtn.addEventListener('click', () => {
-            if (!imageUpload.files || !imageUpload.files[0]) { 
-                alert('Unggah screenshot bukti voting dulu di langkah 2!'); 
-                return; 
-            }
-            if (!frameUpload.files || !frameUpload.files[0]) { 
-                alert('Pilih file bingkai frame.png dulu di langkah 3!'); 
+            if (imageUpload.files.length === 0 || frameUpload.files.length === 0) { 
+                alert('Pilih foto bukti vote DAN file frame.png terlebih dahulu!'); 
                 return; 
             }
             
-            // Menggunakan FileReader (Basis data teks base64) agar lolos blokir CORS Android
             const userReader = new FileReader();
             const frameReader = new FileReader();
 
             userReader.onload = (e) => {
                 const userImg = new Image();
                 userImg.src = e.target.result;
-
                 userImg.onload = () => {
                     frameReader.onload = (el) => {
                         const frameImg = new Image();
                         frameImg.src = el.target.result;
-
                         frameImg.onload = () => {
-                            // Penyetelan dimensi canvas mengikuti ukuran file bingkai
                             canvas.width = frameImg.width; 
                             canvas.height = frameImg.height;
 
-                            const targetW = frameImg.width * 0.525;
-                            const targetH = frameImg.height * 0.46;
-                            const targetX = (frameImg.width - targetW) / 2;
-                            const targetY = frameImg.height * 0.228;
+                            const targetW = canvas.width * 0.525;
+                            const targetH = canvas.height * 0.46;
+                            const targetX = (canvas.width - targetW) / 2;
+                            const targetY = canvas.height * 0.228;
 
                             ctx.clearRect(0, 0, canvas.width, canvas.height);
-                            
-                            // 1. Lapisan bawah: Bukti Vote
                             ctx.drawImage(userImg, targetX, targetY, targetW, targetH);
+                            ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
 
-                            // 2. Lapisan atas: Bingkai Cetak
-                            ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
-
-                            // 3. Penulisan Nama
                             const user = usernameInput.value.trim() || '@ARMY';
-                            ctx.font = `bold ${frameImg.width * 0.035}px 'Inter', sans-serif`;
+                            ctx.font = `bold ${canvas.width * 0.035}px sans-serif`;
                             ctx.fillStyle = '#ffffff'; 
                             ctx.textAlign = 'center'; 
                             ctx.textBaseline = 'middle';
-                            ctx.shadowColor = 'rgba(0,0,0,0.5)'; 
-                            ctx.shadowBlur = 4;
-                            ctx.fillText(user, frameImg.width / 2, frameImg.height * 0.555);
+                            ctx.fillText(user, canvas.width / 2, canvas.height * 0.555);
 
-                            // Tampilkan hasil final ke tag img agar bisa di-save/hold di Android
                             previewImg.src = canvas.toDataURL('image/png');
                             placeholderText.classList.add('hidden');
                             previewImg.classList.remove('hidden');
                             downloadBtn.classList.remove('hidden');
 
-                            // Sistem download cadangan untuk mobile chrome
                             downloadBtn.onclick = () => {
                                 const l = document.createElement('a');
                                 l.download = `ARMY_VOTE_${user}.png`;
@@ -169,10 +142,10 @@
                             };
                         };
                     };
-                    frameReader.readAsDataURL(frameUpload.files[0]);
+                    frameReader.readAsDataURL(frameUpload.files);
                 };
             };
-            userReader.readAsDataURL(imageUpload.files[0]);
+            userReader.readAsDataURL(imageUpload.files);
         });
     </script>
 </body>
