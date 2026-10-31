@@ -95,34 +95,32 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // Ukuran area lubang target tengah bawaan frame
+                    // Ukuran area lubang putih tengah bawaan frame Anda
                     const targetW = frameImg.width * 0.525;
                     const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // SOLUSI PROPORSI: Menjaga rasio agar mengecil/menyesuaikan frame tanpa melebar ke samping
+                    // RUMUS PENGUNCI AGAR TIDAK MELAR:
+                    // Tinggi dikunci pas seukuran lubang (targetH), lebar mengikuti rasio asli gambarnya
                     const imgRatio = userImg.width / userImg.height;
-                    
-                    // Kunci tinggi gambar mengikuti target lubang frame
                     const drawH = targetH;
-                    // Lebar otomatis mengikuti bentuk rasio asli hp-nya (biar ramping dan tidak melar)
                     const drawW = targetH * imgRatio;
                     
-                    // Taruh pas di tengah-tengah secara horizontal
+                    // Posisi cetak otomatis rata tengah secara horizontal
                     const drawX = targetX + (targetW - drawW) / 2;
 
-                    // 1. Gambar background kotak putih murni
+                    // 1. Gambar kotak background putih polos di area lubang tengah
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(targetX, targetY, targetW, targetH);
 
-                    // 2. Gambar bukti vote dengan tinggi pas dan lebar ramping asli bawaan HP
+                    // 2. Gambar screenshot dengan proporsi proporsional (tinggi pas, lebar menyesuaikan asli)
                     ctx.drawImage(userImg, drawX, targetY, drawW, drawH);
                     
-                    // 3. Ditimpa bingkai tiket merah di depannya
+                    // 3. Ditimpa bingkai tiket merah utama di depannya
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
-                    // Teks nama
+                    // Cetak tulisan nama di pita merah
                     const user = usernameInput.value.trim() || '@ARMY';
                     ctx.font = `bold ${frameImg.width * 0.035}px 'Inter', sans-serif`;
                     ctx.fillStyle = '#ffffff'; 
