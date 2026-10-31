@@ -95,28 +95,16 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
+                    // Mengembalikan posisi lubang target yang presisi dengan frame Anda
                     const targetW = frameImg.width * 0.525;
                     const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    const imgRatio = userImg.width / userImg.height;
-                    const targetRatio = targetW / targetH;
-
-                    let sourceX = 0;
-                    let sourceY = 0;
-                    let sourceW = userImg.width;
-                    let sourceH = userImg.height;
-
-                    if (imgRatio > targetRatio) {
-                        sourceW = userImg.height * targetRatio;
-                        sourceX = (userImg.width - sourceW) / 2;
-                    } else {
-                        sourceH = userImg.width / targetRatio;
-                        sourceY = (userImg.height - sourceH) / 2;
-                    }
-
-                    ctx.drawImage(userImg, sourceX, sourceY, sourceW, sourceH, targetX, targetY, targetW, targetH);
+                    // Gambar user langsung dipaksa mengikuti area target agar menutup sempurna
+                    ctx.drawImage(userImg, targetX, targetY, targetW, targetH);
+                    
+                    // Gambar frame menimpa di depan gambar user
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
                     const user = usernameInput.value.trim() || '@ARMY';
