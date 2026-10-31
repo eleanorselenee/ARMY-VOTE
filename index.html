@@ -1,101 +1,11 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTS ARMY VOTE</title>
-    <link href="https://googleapis.com" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: #111; display: flex; flex-direction: column; align-items: center; padding: 16px; }
-        .banner { width: 100%; max-width: 440px; background: #ba181b; border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 16px; border: 2px dashed #fff; color: #fff; }
-        .banner h1 { font-size: 22px; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px; }
-        .banner p { font-size: 12px; opacity: 0.9; }
-        .card { width: 100%; max-width: 440px; background: #fff; border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .title { display: flex; align-items: center; font-size: 15px; font-weight: 800; color: #ba181b; text-transform: uppercase; margin-bottom: 12px; }
-        .num { background: #111; color: #fff; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; margin-right: 10px; }
-        .desc { font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.4; }
-        input[type="text"] { width: 100%; padding: 12px 16px; border: 1.5px solid #111; border-radius: 30px; font-size: 14px; outline: none; }
-        .upload-box { background: #111; border: 1.5px dashed #ba181b; border-radius: 16px; padding: 24px; text-align: center; position: relative; }
-        .upload-box p { color: #fff; font-size: 13px; font-weight: 600; }
-        .file-hidden { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        .btn { width: 100%; max-width: 440px; color: white; font-weight: 800; padding: 14px; border: none; border-radius: 30px; cursor: pointer; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; background: #ba181b; margin-bottom: 16px; }
-        .btn-down { background: #111; margin-top: 12px; }
-        .preview-box { width: 100%; background: #111; border-radius: 12px; padding: 8px; display: flex; justify-content: center; min-height: 120px; }
-        .preview-box p { color: #94a3b8; font-size: 12px; font-style: italic; text-align: center; padding: 20px; }
-        #previewImg { max-width: 100%; height: auto; border-radius: 10px; }
-        .hidden { display: none !important; }
-    </style>
-</head>
-<body>
-
-    <div class="banner">
-        <h1>ARMY VOTE PARTY</h1>
-        <p>Hi, ARMY! Let's personalize your MAMA certificate.</p>
-    </div>
-
-    <!-- LANGKAH 1 -->
-    <div class="card">
-        <div class="title"><div class="num">1</div>Your Username</div>
-        <p class="desc">Akan otomatis tercetak di atas selotip merah bingkai kustom kamu.</p>
-        <input type="text" id="usernameInput" placeholder="@yourusername">
-    </div>
-
-    <!-- LANGKAH 2 -->
-    <div class="card">
-        <div class="title"><div class="num">2</div>Add Your Voting Proof</div>
-        <p class="desc">Gunakan screenshot lembar sertifikat resmi dari Mnet Plus.</p>
-        <div class="upload-box">
-            <p id="uploadStatus">Tap to choose a screenshot</p>
-            <input type="file" id="imageUpload" class="file-hidden" accept="image/*">
-        </div>
-    </div>
-
-    <button id="generateBtn" class="btn">✨ Generate Gambar</button>
-
-    <!-- LANGKAH 3 -->
-    <div class="card">
-        <div class="title"><div class="num">3</div>Your Overlay</div>
-        <p class="desc">Sertifikat kustom yang sudah rapi akan muncul di bawah ini.</p>
-        <div class="preview-box">
-            <canvas id="canvas" class="hidden"></canvas>
-            <p id="placeholderText">Waiting for your proof...</p>
-            <img id="previewImg" src="" alt="" class="hidden">
-        </div>
-        <button id="downloadBtn" class="btn btn-down hidden">Save / Download</button>
-    </div>
-
-    <script>
-        const imageUpload = document.getElementById('imageUpload');
-        const usernameInput = document.getElementById('usernameInput');
-        const generateBtn = document.getElementById('generateBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const canvas = document.getElementById('canvas');
-        const previewImg = document.getElementById('previewImg');
-        const placeholderText = document.getElementById('placeholderText');
-        const uploadStatus = document.getElementById('uploadStatus');
-        const ctx = canvas.getContext('2d');
-
-        imageUpload.addEventListener('change', () => {
-            if (imageUpload.files.length > 0) {
-                uploadStatus.innerText = "✓ Bukti Vote Terpilih";
-                uploadStatus.style.color = "#10b981";
-            }
-        });
-
         generateBtn.addEventListener('click', () => {
             if (imageUpload.files.length === 0) { alert('Unggah screenshot bukti voting dulu!'); return; }
             
             const userImg = new Image();
             const frameImg = new Image();
             
-            // PENGAMAN UTAMA: Agar gambar dari hosting/github tidak diblokir oleh browser (CORS)
             frameImg.crossOrigin = 'anonymous'; 
-            
-            // Perbaikan utama: Menggunakan indeks [0] untuk mengambil file gambar user
             userImg.src = URL.createObjectURL(imageUpload.files[0]);
-            
-            // Mengarahkan ke file frame.png yang ada di folder web kamu secara otomatis
             frameImg.src = 'frame.png'; 
 
             frameImg.onload = () => {
@@ -103,14 +13,36 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // Ukuran lubang kotak tengah bingkai tiket merah kamu
+                    // Ukuran area kotak tengah bingkai tiket merah Anda
                     const targetW = frameImg.width * 0.525;
                     const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // Gambar bukti milik user dulu di background
-                    ctx.drawImage(userImg, targetX, targetY, targetW, targetH);
+                    // ==========================================
+                    // LOGIKA PERBAIKAN: OBJECT-FIT COVER CANVAS
+                    // ==========================================
+                    const imgRatio = userImg.width / userImg.height;
+                    const targetRatio = targetW / targetH;
+
+                    let sourceX = 0;
+                    let sourceY = 0;
+                    let sourceW = userImg.width;
+                    let sourceH = userImg.height;
+
+                    if (imgRatio > targetRatio) {
+                        // Jika gambar user terlalu lebar (HP layar lebar/tablet)
+                        sourceW = userImg.height * targetRatio;
+                        sourceX = (userImg.width - sourceW) / 2;
+                    } else {
+                        // Jika gambar user terlalu tinggi (HP layar panjang/kekinian)
+                        sourceH = userImg.width / targetRatio;
+                        sourceY = (userImg.height - sourceH) / 2;
+                    }
+
+                    // Gambar bukti milik user dengan pemotongan otomatis agar proporsional
+                    ctx.drawImage(userImg, sourceX, sourceY, sourceW, sourceH, targetX, targetY, targetW, targetH);
+                    // ==========================================
 
                     // Gambar frame otomatis menimpa di depannya
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
@@ -144,6 +76,3 @@
                 alert("Gagal memuat otomatis file 'frame.png'. Coba cek kembali apakah nama filenya di folder sudah benar huruf kecil semua.");
             };
         });
-    </script>
-</body>
-</html>
