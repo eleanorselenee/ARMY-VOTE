@@ -95,14 +95,11 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // Mengunci ukuran tengah lubang agar sejajar sempurna sesuai HP kamu
                     const targetW = frameImg.width * 0.525;
                     const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // MENGGUNAKAN SMART CROP: Mendeteksi area putih murni sertifikat
-                    // Menghilangkan bagian hitam navbar/status bar otomatis dari HP lain
                     const tempCanvas = document.createElement('canvas');
                     const tempCtx = tempCanvas.getContext('2d');
                     tempCanvas.width = userImg.width;
@@ -110,40 +107,47 @@
                     tempCtx.drawImage(userImg, 0, 0);
 
                     let imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height).data;
-                    let topBound = 0;
-                    let bottomBound = userImg.height;
+                    let detectedTop = -1;
 
-                    // Cari batas atas area sertifikat putih
-                    for (let y = 0; y < userImg.height; y++) {
-                        let idx = (y * userImg.width + Math.floor(userImg.width / 2)) * 4;
-                        if (imgData[idx] > 240 && imgData[idx+1] > 240 && imgData[idx+2] > 240) {
-                            topBound = y;
+                    for (let y = Math.floor(userImg.height * 0.1); y < userImg.height * 0.4; y++) {
+                        let isDarkLine = true;
+                        let startX = Math.floor(userImg.width * 0.45);
+                        let endX = Math.floor(userImg.width * 0.55);
+                        
+                        for (let x = startX; x < endX; x++) {
+                            let idx = (y * userImg.width + x) * 4;
+                            let r = imgData[idx], g = imgData[idx+1], b = imgData[idx+2];
+                            if (r > 60 || g > 60 || b > 60) {
+                                isDarkLine = false;
+                                break;
+                            }
+                        }
+                        if (isDarkLine) {
+                            detectedTop = y;
                             break;
                         }
                     }
 
-                    // Cari batas bawah area sertifikat putih
-                    for (let y = userImg.height - 1; y > topBound; y--) {
-                        let idx = (y * userImg.width + Math.floor(userImg.width / 2)) * 4;
-                        if (imgData[idx] > 240 && imgData[idx+1] > 240 && imgData[idx+2] > 240) {
-                            bottomBound = y;
-                            break;
+                    let sourceY = 0;
+                    let sourceH = userImg.height;
+
+                    if (detectedTop !== -1) {
+                        sourceY = detectedTop - Math.floor(userImg.height * 0.04);
+                        sourceH = Math.floor(userImg.width * 1.32); 
+                        if (sourceY + sourceH > userImg.height) {
+                            sourceH = userImg.height - sourceY;
                         }
+                    } else {
+                        sourceY = Math.floor(userImg.height * 0.16);
+                        sourceH = Math.floor(userImg.height * 0.65);
                     }
 
-                    let cropH = bottomBound - topBound;
-                    if(cropH < userImg.height * 0.4) { 
-                        topBound = 0; 
-                        cropH = userImg.height; 
-                    }
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(targetX, targetY, targetW, targetH);
 
-                    // Gambar bagian putih sertifikat secara fit rapat di tengah frame
-                    ctx.drawImage(userImg, 0, topBound, userImg.width, cropH, targetX, targetY, targetW, targetH);
-                    
-                    // Tempel frame utama di depannya
+                    ctx.drawImage(userImg, 0, sourceY, userImg.width, sourceH, targetX, targetY, targetW, targetH);
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
-                    // Cetak teks nama di atas pita merah
                     const user = usernameInput.value.trim() || '@ARMY';
                     ctx.font = `bold ${frameImg.width * 0.035}px 'Inter', sans-serif`;
                     ctx.fillStyle = '#ffffff'; 
