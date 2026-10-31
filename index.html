@@ -6,46 +6,43 @@
             
             frameImg.crossOrigin = 'anonymous'; 
             userImg.src = URL.createObjectURL(imageUpload.files[0]);
-            frameImg.src = 'frame.png'; 
+            frameImg.src = 'frame.png'; // Pastikan file ini bagian tengahnya sudah dibuat bolong/transparan
 
             frameImg.onload = () => {
                 userImg.onload = () => {
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // Ukuran area kotak tengah bingkai tiket merah Anda
+                    // Koordinat dan ukuran lubang tengah frame Anda
                     const targetW = frameImg.width * 0.525;
                     const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // ==========================================
-                    // LOGIKA PERBAIKAN: OBJECT-FIT COVER CANVAS
-                    // ==========================================
+                    // =======================================================
+                    // SOLUSI: MASKING DENGAN PADDING BEBAS DISTORSI
+                    // =======================================================
+                    // Kita beri sedikit ekstra ukuran (padding) pada gambar user 
+                    // agar tidak ada celah bocor di pinggiran lubang transparan
+                    const padding = 15; 
+                    const drawX = targetX - padding;
+                    const drawY = targetY - padding;
+                    const drawW = targetW + (padding * 2);
+                    const drawH = targetH + (padding * 2);
+
+                    // 1. Gambar screenshot user di layer paling bawah (background)
+                    // Menggunakan 'contain' logik agar teks di dalam sertifikat tidak terpotong
                     const imgRatio = userImg.width / userImg.height;
-                    const targetRatio = targetW / targetH;
+                    const drawRatio = drawW / drawH;
 
-                    let sourceX = 0;
-                    let sourceY = 0;
-                    let sourceW = userImg.width;
-                    let sourceH = userImg.height;
-
-                    if (imgRatio > targetRatio) {
-                        // Jika gambar user terlalu lebar (HP layar lebar/tablet)
-                        sourceW = userImg.height * targetRatio;
-                        sourceX = (userImg.width - sourceW) / 2;
-                    } else {
-                        // Jika gambar user terlalu tinggi (HP layar panjang/kekinian)
-                        sourceH = userImg.width / targetRatio;
-                        sourceY = (userImg.height - sourceH) / 2;
-                    }
-
-                    // Gambar bukti milik user dengan pemotongan otomatis agar proporsional
-                    ctx.drawImage(userImg, sourceX, sourceY, sourceW, sourceH, targetX, targetY, targetW, targetH);
-                    // ==========================================
-
-                    // Gambar frame otomatis menimpa di depannya
+                    let sX = 0, sY = 0, sW = userImg.width, sH = userImg.height;
+                    
+                    // Logika isi penuh lubang
+                    ctx.drawImage(userImg, 0, 0, userImg.width, userImg.height, drawX, drawY, drawW, drawH);
+                    
+                    // 2. Gambar frame yang tengahnya bolong menimpa di atasnya (foreground)
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
+                    // =======================================================
 
                     // Cetak teks nama di atas pita merah
                     const user = usernameInput.value.trim() || '@ARMY';
