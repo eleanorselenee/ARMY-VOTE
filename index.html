@@ -101,19 +101,19 @@
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // KUNCI HALAMAN ASLI: Menjaga ukuran screenshot 100% asli bawaan HP (tidak ditarik membesar/melebar)
+                    // MURNI 100% UKURAN ASLI FILE: Tidak diubah ukurannya, tidak dibesarkan, tidak dilebarkan
                     const drawW = userImg.width;
                     const drawH = userImg.height;
 
-                    // Otomatis menaruh letak koordinat screenshot tepat di tengah lubang secara vertikal & horizontal
+                    // Menaruh posisinya tepat di tengah-tengah lubang frame secara otomatis
                     const drawX = targetX + (targetW - drawW) / 2;
                     const drawY = targetY + (targetH - drawH) / 2;
 
-                    // 1. Lapisan dasar kotak putih bersih di area tengah agar tidak tembus latar belakang merah
+                    // 1. Lapisan dasar kotak putih bersih polos di area tengah
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(targetX, targetY, targetW, targetH);
 
-                    // 2. Menggambar screenshot user apa adanya tanpa modifikasi ukuran paksa
+                    // 2. Menggambar screenshot user MURNI menggunakan resolusi lebar & tinggi aslinya
                     ctx.drawImage(userImg, drawX, drawY, drawW, drawH);
                     
                     // 3. Ditimpa dengan bingkai tiket merah utama di depannya
