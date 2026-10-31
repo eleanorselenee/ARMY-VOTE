@@ -95,30 +95,24 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // Batas target area lubang putih dari gambar frame asli Anda
-                    const targetW = frameImg.width * 0.525;
+                    // Menggunakan tinggi absolut awal dari frame yang terbukti paling pas sejajar di HP Anda
                     const targetH = frameImg.height * 0.46;
-                    const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // Mengunci skala berdasarkan lebar target agar rasio gambar tetap asli (tidak melar)
+                    // PERBAIKAN TOTAL: Lebar dihitung proporsional murni mengikuti rasio asli screenshot
+                    // Gambar TIDAK AKAN ditarik melar/lebar ke samping sama sekali
                     const imgRatio = userImg.width / userImg.height;
-                    const drawW = targetW;
-                    const drawH = targetW / imgRatio;
-                    const drawX = targetX;
+                    const drawW = targetH * imgRatio;
+                    const drawX = (frameImg.width - drawW) / 2;
 
-                    // Penyesuaian Offset Vertikal Dinamis: 
-                    // Menggeser titik gambar sedikit ke bawah agar area tengah berisi foto BTS menutupi celah pita dengan pas
-                    const drawY = targetY - (drawH * 0.045);
-
-                    // 1. Lapisan dasar putih bersih agar tidak bocor abu-abu/hitam di belakang
+                    // 1. Lapisan dasar putih bersih di belakang area kotak lubang tengah
                     ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(targetX, targetY, targetW, targetH);
+                    ctx.fillRect((frameImg.width - (frameImg.width * 0.525)) / 2, targetY, frameImg.width * 0.525, targetH);
 
-                    // 2. Menggambar screenshot user secara proporsional dengan kompensasi geser vertikal
-                    ctx.drawImage(userImg, drawX, drawY, drawW, drawH);
+                    // 2. Gambar screenshot ditaruh di tengah dengan tinggi pas tanpa diubah ukuran lebar aslinya
+                    ctx.drawImage(userImg, drawX, targetY, drawW, targetH);
                     
-                    // 3. Menimpa dengan bingkai tiket merah utama
+                    // 3. Ditimpa dengan bingkai tiket merah utama
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
                     // Cetak nama username di atas selotip merah
@@ -144,7 +138,7 @@
                             l.click();
                         };
                     } catch (err) {
-                        alert("Gagal memproses gambar. Pastikan file 'frame.png' ada di folder yang sama.");
+                        alert("Gagal memproses gambar. Pastikan file 'frame.png' ada di folder repository.");
                         console.error(err);
                     }
                 };
