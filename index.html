@@ -34,14 +34,12 @@
         <p>Hi, ARMY! Let's personalize your MAMA certificate.</p>
     </div>
 
-    <!-- LANGKAH 1 -->
     <div class="card">
         <div class="title"><div class="num">1</div>Your Username</div>
         <p class="desc">Akan otomatis tercetak di atas selotip merah bingkai kustom kamu.</p>
         <input type="text" id="usernameInput" placeholder="@yourusername">
     </div>
 
-    <!-- LANGKAH 2 -->
     <div class="card">
         <div class="title"><div class="num">2</div>Add Your Voting Proof</div>
         <p class="desc">Gunakan screenshot lembar sertifikat resmi dari Mnet Plus.</p>
@@ -53,7 +51,6 @@
 
     <button id="generateBtn" class="btn">✨ Generate Gambar</button>
 
-    <!-- LANGKAH 3 -->
     <div class="card">
         <div class="title"><div class="num">3</div>Your Overlay</div>
         <p class="desc">Sertifikat kustom yang sudah rapi akan muncul di bawah ini.</p>
@@ -144,14 +141,14 @@
                             l.click();
                         };
                     } catch (err) {
-                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah di-upload ke folder yang sama.");
+                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah di-upload.");
                         console.error(err);
                     }
                 };
             };
 
             frameImg.onerror = () => {
-                alert("Gagal memuat otomatis file 'frame.png'. Coba cek kembali apakah nama filenya di folder sudah benar huruf kecil semua.");
+                alert("Gagal memuat file 'frame.png'. Periksa nama filenya.");
             };
         });
     </script>
