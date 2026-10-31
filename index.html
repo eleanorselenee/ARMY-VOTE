@@ -87,6 +87,8 @@
             const frameImg = new Image();
             
             frameImg.crossOrigin = 'anonymous'; 
+            
+            // PERBAIKAN UTAMA: Mengembalikan [0] untuk mengambil data gambar user dengan benar
             userImg.src = URL.createObjectURL(imageUpload.files[0]);
             frameImg.src = 'frame.png'; 
 
@@ -95,57 +97,16 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
+                    // Menggunakan ukuran asli koordinat box Anda yang sudah pas
                     const targetW = frameImg.width * 0.525;
                     const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    const tempCanvas = document.createElement('canvas');
-                    const tempCtx = tempCanvas.getContext('2d');
-                    tempCanvas.width = userImg.width;
-                    tempCanvas.height = userImg.height;
-                    tempCtx.drawImage(userImg, 0, 0);
-
-                    let imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height).data;
-                    let detectedTop = -1;
-
-                    for (let y = Math.floor(userImg.height * 0.1); y < userImg.height * 0.4; y++) {
-                        let isDarkLine = true;
-                        let startX = Math.floor(userImg.width * 0.45);
-                        let endX = Math.floor(userImg.width * 0.55);
-                        
-                        for (let x = startX; x < endX; x++) {
-                            let idx = (y * userImg.width + x) * 4;
-                            let r = imgData[idx], g = imgData[idx+1], b = imgData[idx+2];
-                            if (r > 60 || g > 60 || b > 60) {
-                                isDarkLine = false;
-                                break;
-                            }
-                        }
-                        if (isDarkLine) {
-                            detectedTop = y;
-                            break;
-                        }
-                    }
-
-                    let sourceY = 0;
-                    let sourceH = userImg.height;
-
-                    if (detectedTop !== -1) {
-                        sourceY = detectedTop - Math.floor(userImg.height * 0.04);
-                        sourceH = Math.floor(userImg.width * 1.32); 
-                        if (sourceY + sourceH > userImg.height) {
-                            sourceH = userImg.height - sourceY;
-                        }
-                    } else {
-                        sourceY = Math.floor(userImg.height * 0.16);
-                        sourceH = Math.floor(userImg.height * 0.65);
-                    }
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(targetX, targetY, targetW, targetH);
-
-                    ctx.drawImage(userImg, 0, sourceY, userImg.width, sourceH, targetX, targetY, targetW, targetH);
+                    // DIPAKSA FIT MUTLAK: Mengunci gambar user agar 100% menutupi area lubang tengah bagai sensor
+                    ctx.drawImage(userImg, targetX, targetY, targetW, targetH);
+                    
+                    // Gambar frame menimpa di atasnya
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
                     const user = usernameInput.value.trim() || '@ARMY';
@@ -170,7 +131,7 @@
                             l.click();
                         };
                     } catch (err) {
-                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah di-upload.");
+                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah di-upload ke folder repository.");
                         console.error(err);
                     }
                 };
