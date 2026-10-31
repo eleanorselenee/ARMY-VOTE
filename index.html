@@ -95,15 +95,40 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    const targetW = frameImg.width * 0.525;
-                    const targetH = frameImg.height * 0.46;
+                    // Mengatur ukuran target penempatan gambar sertifikat user di background
+                    const targetW = frameImg.width * 0.53;
+                    const targetH = frameImg.height * 0.465;
                     const targetX = (frameImg.width - targetW) / 2;
-                    const targetY = frameImg.height * 0.228;
+                    const targetY = frameImg.height * 0.226;
 
-                    // Menggambar langsung gambar user pas sesuai kotak target
-                    ctx.drawImage(userImg, targetX, targetY, targetW, targetH);
+                    // METODE PROPORSIONAL AMAN (CONTAIN): Menjamin teks tidak gepeng & tidak kepotong
+                    const imgRatio = userImg.width / userImg.height;
+                    const targetRatio = targetW / targetH;
+
+                    let drawW = targetW;
+                    let drawH = targetH;
+                    let drawX = targetX;
+                    let drawY = targetY;
+
+                    if (imgRatio > targetRatio) {
+                        drawH = targetW / imgRatio;
+                        drawY = targetY + (targetH - drawH) / 2;
+                    } else {
+                        drawW = targetH * imgRatio;
+                        drawX = targetX + (targetW - drawW) / 2;
+                    }
+
+                    // 1. Gambar latar putih bersih dulu agar sisa crop HP tertutupi rapi
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(targetX - 5, targetY - 5, targetW + 10, targetH + 10);
+
+                    // 2. Tempel gambar bukti milik user secara proporsional pas di tengah lubang
+                    ctx.drawImage(userImg, drawX, drawY, drawW, drawH);
+                    
+                    // 3. Ditimpa dengan bingkai tiket merah (foreground) yang tengahnya sudah transparan
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
+                    // Cetak teks nama di atas pita merah
                     const user = usernameInput.value.trim() || '@ARMY';
                     ctx.font = `bold ${frameImg.width * 0.035}px 'Inter', sans-serif`;
                     ctx.fillStyle = '#ffffff'; 
@@ -126,7 +151,7 @@
                             l.click();
                         };
                     } catch (err) {
-                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah di-upload.");
+                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah transparan.");
                         console.error(err);
                     }
                 };
