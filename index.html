@@ -6,49 +6,44 @@
             
             frameImg.crossOrigin = 'anonymous'; 
             userImg.src = URL.createObjectURL(imageUpload.files[0]);
-            frameImg.src = 'frame.png'; // Pastikan file ini bagian tengahnya sudah dibuat bolong/transparan
+            frameImg.src = 'frame.png'; 
 
             frameImg.onload = () => {
                 userImg.onload = () => {
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // Koordinat dan ukuran lubang tengah frame Anda
                     const targetW = frameImg.width * 0.525;
                     const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // =======================================================
-                    // SOLUSI: MASKING DENGAN PADDING BEBAS DISTORSI
-                    // =======================================================
-                    // Kita beri sedikit ekstra ukuran (padding) pada gambar user 
-                    // agar tidak ada celah bocor di pinggiran lubang transparan
-                    const padding = 15; 
-                    const drawX = targetX - padding;
-                    const drawY = targetY - padding;
-                    const drawW = targetW + (padding * 2);
-                    const drawH = targetH + (padding * 2);
-
-                    // 1. Gambar screenshot user di layer paling bawah (background)
-                    // Menggunakan 'contain' logik agar teks di dalam sertifikat tidak terpotong
                     const imgRatio = userImg.width / userImg.height;
-                    const drawRatio = drawW / drawH;
+                    const targetRatio = targetW / targetH;
 
-                    let sX = 0, sY = 0, sW = userImg.width, sH = userImg.height;
-                    
-                    // Logika isi penuh lubang
-                    ctx.drawImage(userImg, 0, 0, userImg.width, userImg.height, drawX, drawY, drawW, drawH);
-                    
-                    // 2. Gambar frame yang tengahnya bolong menimpa di atasnya (foreground)
+                    let sourceX = 0;
+                    let sourceY = 0;
+                    let sourceW = userImg.width;
+                    let sourceH = userImg.height;
+
+                    if (imgRatio > targetRatio) {
+                        sourceW = userImg.height * targetRatio;
+                        sourceX = (userImg.width - sourceW) / 2;
+                    } else {
+                        sourceH = userImg.width / targetRatio;
+                        sourceY = (userImg.height - sourceH) / 2;
+                    }
+
+                    ctx.drawImage(userImg, sourceX, sourceY, sourceW, sourceH, targetX, targetY, targetW, targetH);
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
-                    // =======================================================
 
-                    // Cetak teks nama di atas pita merah
                     const user = usernameInput.value.trim() || '@ARMY';
                     ctx.font = `bold ${frameImg.width * 0.035}px 'Inter', sans-serif`;
-                    ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                    ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 4;
+                    ctx.fillStyle = '#ffffff'; 
+                    ctx.textAlign = 'center'; 
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(0,0,0,0.5)'; 
+                    ctx.shadowBlur = 4;
                     ctx.fillText(user, frameImg.width / 2, frameImg.height * 0.555);
 
                     try {
@@ -60,7 +55,8 @@
                         downloadBtn.onclick = () => {
                             const l = document.createElement('a');
                             l.download = `ARMY_VOTE_${user}.png`;
-                            l.href = previewImg.src; l.click();
+                            l.href = previewImg.src; 
+                            l.click();
                         };
                     } catch (err) {
                         alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah di-upload ke folder yang sama.");
