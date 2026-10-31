@@ -21,7 +21,7 @@
         .file-hidden { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
         .btn { width: 100%; max-width: 440px; color: white; font-weight: 800; padding: 14px; border: none; border-radius: 30px; cursor: pointer; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; background: #ba181b; margin-bottom: 16px; }
         .btn-down { background: #111; margin-top: 12px; }
-        .preview-box { width: 100%; background: #111; border-radius: 12px; padding: 8px; display: flex; justify-content: center; min-height: 120px; flex-direction: column; align-items: center; }
+        .preview-box { width: 100%; background: #111; border-radius: 12px; padding: 8px; display: flex; justify-content: center; min-height: 120px; }
         .preview-box p { color: #94a3b8; font-size: 12px; font-style: italic; text-align: center; padding: 20px; }
         #previewImg { max-width: 100%; height: auto; border-radius: 10px; }
         .hidden { display: none !important; }
@@ -60,7 +60,7 @@
         <div class="preview-box">
             <canvas id="canvas" class="hidden"></canvas>
             <p id="placeholderText">Waiting for your proof...</p>
-            <img id="previewImg" alt="" class="hidden">
+            <img id="previewImg" src="" alt="" class="hidden">
         </div>
         <button id="downloadBtn" class="btn btn-down hidden">Save / Download</button>
     </div>
@@ -84,19 +84,18 @@
         });
 
         generateBtn.addEventListener('click', () => {
-            if (imageUpload.files.length === 0) { 
-                alert('Unggah screenshot bukti voting dulu!'); 
-                return; 
-            }
+            if (imageUpload.files.length === 0) { alert('Unggah screenshot bukti voting dulu!'); return; }
             
             const userImg = new Image();
             const frameImg = new Image();
             
-            // PENGAMAN CORS
+            // PENGAMAN UTAMA: Agar gambar dari hosting/github tidak diblokir oleh browser (CORS)
             frameImg.crossOrigin = 'anonymous'; 
             
-            // PERBAIKAN UTAMA: Menggunakan `.files[0]` agar file terbaca dengan benar
+            // Perbaikan utama: Menggunakan indeks [0] untuk mengambil file gambar user
             userImg.src = URL.createObjectURL(imageUpload.files[0]);
+            
+            // Mengarahkan ke file frame.png yang ada di folder web kamu secara otomatis
             frameImg.src = 'frame.png'; 
 
             frameImg.onload = () => {
@@ -110,24 +109,20 @@
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // Menggunakan sistem penarikan murni (Stretch) tanpa potong agar menutup 100% rapat
+                    // Gambar bukti milik user dulu di background
                     ctx.drawImage(userImg, targetX, targetY, targetW, targetH);
 
-                    // Lapisan depan: Tempel gambar bingkai tiket merah utama
+                    // Gambar frame otomatis menimpa di depannya
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
                     // Cetak teks nama di atas pita merah
                     const user = usernameInput.value.trim() || '@ARMY';
                     ctx.font = `bold ${frameImg.width * 0.035}px 'Inter', sans-serif`;
-                    ctx.fillStyle = '#ffffff'; 
-                    ctx.textAlign = 'center'; 
-                    ctx.textBaseline = 'middle';
-                    ctx.shadowColor = 'rgba(0,0,0,0.5)'; 
-                    ctx.shadowBlur = 4;
+                    ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 4;
                     ctx.fillText(user, frameImg.width / 2, frameImg.height * 0.555);
 
                     try {
-                        // Salin hasil canvas ke tag img agar bisa di-long-press / save di HP
                         previewImg.src = canvas.toDataURL('image/png');
                         placeholderText.classList.add('hidden');
                         previewImg.classList.remove('hidden');
@@ -136,19 +131,17 @@
                         downloadBtn.onclick = () => {
                             const l = document.createElement('a');
                             l.download = `ARMY_VOTE_${user}.png`;
-                            l.href = previewImg.src; 
-                            l.click();
+                            l.href = previewImg.src; l.click();
                         };
                     } catch (err) {
-                        alert("Gagal memproses gambar. Pastikan file 'frame.png' berada di folder yang sama atau gunakan link URL gambar yang valid.");
+                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah di-upload ke folder yang sama.");
                         console.error(err);
                     }
                 };
             };
 
-            // Menangani error jika gambar frame.png gagal dimuat
             frameImg.onerror = () => {
-                alert("Gagal memuat file 'frame.png'. Pastikan nama file benar dan sudah di-upload.");
+                alert("Gagal memuat otomatis file 'frame.png'. Coba cek kembali apakah nama filenya di folder sudah benar huruf kecil semua.");
             };
         });
     </script>
