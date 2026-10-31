@@ -95,16 +95,13 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // Mengembalikan posisi lubang target yang presisi dengan frame Anda
                     const targetW = frameImg.width * 0.525;
                     const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // Gambar user langsung dipaksa mengikuti area target agar menutup sempurna
+                    // Menggambar langsung gambar user pas sesuai kotak target
                     ctx.drawImage(userImg, targetX, targetY, targetW, targetH);
-                    
-                    // Gambar frame menimpa di depan gambar user
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
                     const user = usernameInput.value.trim() || '@ARMY';
