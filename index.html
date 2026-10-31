@@ -95,22 +95,28 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // Mengembalikan ukuran box tinggi standar milik HP Anda yang paling pas
+                    // Batas target area lubang putih dari gambar frame asli Anda
+                    const targetW = frameImg.width * 0.525;
                     const targetH = frameImg.height * 0.46;
+                    const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // LOGIKA UTAMA: Hitung lebar proporsional otomatis (Kunci Tinggi)
-                    // Menjamin gambar TIDAK GEPENG ke samping dan tinggi teks lurus sejajar
+                    // Mengunci skala berdasarkan lebar target agar rasio gambar tetap asli (tidak melar)
                     const imgRatio = userImg.width / userImg.height;
-                    const drawW = targetH * imgRatio;
-                    const drawX = (frameImg.width - drawW) / 2;
+                    const drawW = targetW;
+                    const drawH = targetW / imgRatio;
+                    const drawX = targetX;
 
-                    // 1. Gambar latar putih kotak bersih di belakang agar aman
+                    // Penyesuaian Offset Vertikal Dinamis: 
+                    // Menggeser titik gambar sedikit ke bawah agar area tengah berisi foto BTS menutupi celah pita dengan pas
+                    const drawY = targetY - (drawH * 0.045);
+
+                    // 1. Lapisan dasar putih bersih agar tidak bocor abu-abu/hitam di belakang
                     ctx.fillStyle = '#ffffff';
-                    ctx.fillRect((frameImg.width - (frameImg.width * 0.525)) / 2, targetY, frameImg.width * 0.525, targetH);
+                    ctx.fillRect(targetX, targetY, targetW, targetH);
 
-                    // 2. Menggambar screenshot user secara proporsional lurus di tengah
-                    ctx.drawImage(userImg, drawX, targetY, drawW, targetH);
+                    // 2. Menggambar screenshot user secara proporsional dengan kompensasi geser vertikal
+                    ctx.drawImage(userImg, drawX, drawY, drawW, drawH);
                     
                     // 3. Menimpa dengan bingkai tiket merah utama
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
