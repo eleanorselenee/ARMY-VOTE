@@ -95,37 +95,52 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // Mengatur ukuran target penempatan gambar sertifikat user di background
-                    const targetW = frameImg.width * 0.53;
-                    const targetH = frameImg.height * 0.465;
+                    // Mengunci ukuran tengah lubang agar sejajar sempurna sesuai HP kamu
+                    const targetW = frameImg.width * 0.525;
+                    const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
-                    const targetY = frameImg.height * 0.226;
+                    const targetY = frameImg.height * 0.228;
 
-                    // METODE PROPORSIONAL AMAN (CONTAIN): Menjamin teks tidak gepeng & tidak kepotong
-                    const imgRatio = userImg.width / userImg.height;
-                    const targetRatio = targetW / targetH;
+                    // MENGGUNAKAN SMART CROP: Mendeteksi area putih murni sertifikat
+                    // Menghilangkan bagian hitam navbar/status bar otomatis dari HP lain
+                    const tempCanvas = document.createElement('canvas');
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCanvas.width = userImg.width;
+                    tempCanvas.height = userImg.height;
+                    tempCtx.drawImage(userImg, 0, 0);
 
-                    let drawW = targetW;
-                    let drawH = targetH;
-                    let drawX = targetX;
-                    let drawY = targetY;
+                    let imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height).data;
+                    let topBound = 0;
+                    let bottomBound = userImg.height;
 
-                    if (imgRatio > targetRatio) {
-                        drawH = targetW / imgRatio;
-                        drawY = targetY + (targetH - drawH) / 2;
-                    } else {
-                        drawW = targetH * imgRatio;
-                        drawX = targetX + (targetW - drawW) / 2;
+                    // Cari batas atas area sertifikat putih
+                    for (let y = 0; y < userImg.height; y++) {
+                        let idx = (y * userImg.width + Math.floor(userImg.width / 2)) * 4;
+                        if (imgData[idx] > 240 && imgData[idx+1] > 240 && imgData[idx+2] > 240) {
+                            topBound = y;
+                            break;
+                        }
                     }
 
-                    // 1. Gambar latar putih bersih dulu agar sisa crop HP tertutupi rapi
-                    ctx.fillStyle = "#ffffff";
-                    ctx.fillRect(targetX - 5, targetY - 5, targetW + 10, targetH + 10);
+                    // Cari batas bawah area sertifikat putih
+                    for (let y = userImg.height - 1; y > topBound; y--) {
+                        let idx = (y * userImg.width + Math.floor(userImg.width / 2)) * 4;
+                        if (imgData[idx] > 240 && imgData[idx+1] > 240 && imgData[idx+2] > 240) {
+                            bottomBound = y;
+                            break;
+                        }
+                    }
 
-                    // 2. Tempel gambar bukti milik user secara proporsional pas di tengah lubang
-                    ctx.drawImage(userImg, drawX, drawY, drawW, drawH);
+                    let cropH = bottomBound - topBound;
+                    if(cropH < userImg.height * 0.4) { 
+                        topBound = 0; 
+                        cropH = userImg.height; 
+                    }
+
+                    // Gambar bagian putih sertifikat secara fit rapat di tengah frame
+                    ctx.drawImage(userImg, 0, topBound, userImg.width, cropH, targetX, targetY, targetW, targetH);
                     
-                    // 3. Ditimpa dengan bingkai tiket merah (foreground) yang tengahnya sudah transparan
+                    // Tempel frame utama di depannya
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
                     // Cetak teks nama di atas pita merah
@@ -151,7 +166,7 @@
                             l.click();
                         };
                     } catch (err) {
-                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah transparan.");
+                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah di-upload.");
                         console.error(err);
                     }
                 };
