@@ -87,8 +87,6 @@
             const frameImg = new Image();
             
             frameImg.crossOrigin = 'anonymous'; 
-            
-            // PERBAIKAN UTAMA: Mengembalikan [0] untuk mengambil data gambar user dengan benar
             userImg.src = URL.createObjectURL(imageUpload.files[0]);
             frameImg.src = 'frame.png'; 
 
@@ -97,18 +95,27 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // Menggunakan ukuran asli koordinat box Anda yang sudah pas
-                    const targetW = frameImg.width * 0.525;
+                    // Mengembalikan ukuran box tinggi standar milik HP Anda yang paling pas
                     const targetH = frameImg.height * 0.46;
-                    const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // DIPAKSA FIT MUTLAK: Mengunci gambar user agar 100% menutupi area lubang tengah bagai sensor
-                    ctx.drawImage(userImg, targetX, targetY, targetW, targetH);
+                    // LOGIKA UTAMA: Hitung lebar proporsional otomatis (Kunci Tinggi)
+                    // Menjamin gambar TIDAK GEPENG ke samping dan tinggi teks lurus sejajar
+                    const imgRatio = userImg.width / userImg.height;
+                    const drawW = targetH * imgRatio;
+                    const drawX = (frameImg.width - drawW) / 2;
+
+                    // 1. Gambar latar putih kotak bersih di belakang agar aman
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect((frameImg.width - (frameImg.width * 0.525)) / 2, targetY, frameImg.width * 0.525, targetH);
+
+                    // 2. Menggambar screenshot user secara proporsional lurus di tengah
+                    ctx.drawImage(userImg, drawX, targetY, drawW, targetH);
                     
-                    // Gambar frame menimpa di atasnya
+                    // 3. Menimpa dengan bingkai tiket merah utama
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
+                    // Cetak nama username di atas selotip merah
                     const user = usernameInput.value.trim() || '@ARMY';
                     ctx.font = `bold ${frameImg.width * 0.035}px 'Inter', sans-serif`;
                     ctx.fillStyle = '#ffffff'; 
@@ -131,7 +138,7 @@
                             l.click();
                         };
                     } catch (err) {
-                        alert("Gagal memproses gambar. Pastikan file 'frame.png' sudah di-upload ke folder repository.");
+                        alert("Gagal memproses gambar. Pastikan file 'frame.png' ada di folder yang sama.");
                         console.error(err);
                     }
                 };
