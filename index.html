@@ -95,31 +95,34 @@
                     canvas.width = frameImg.width; 
                     canvas.height = frameImg.height;
 
-                    // Koordinat tengah lubang bawaan dari frame tiket merah Anda
+                    // Ukuran area lubang target tengah bawaan frame
                     const targetW = frameImg.width * 0.525;
                     const targetH = frameImg.height * 0.46;
                     const targetX = (frameImg.width - targetW) / 2;
                     const targetY = frameImg.height * 0.228;
 
-                    // MURNI 100% UKURAN ASLI FILE: Tidak diubah ukurannya, tidak dibesarkan, tidak dilebarkan
-                    const drawW = userImg.width;
-                    const drawH = userImg.height;
-
-                    // Menaruh posisinya tepat di tengah-tengah lubang frame secara otomatis
+                    // SOLUSI PROPORSI: Menjaga rasio agar mengecil/menyesuaikan frame tanpa melebar ke samping
+                    const imgRatio = userImg.width / userImg.height;
+                    
+                    // Kunci tinggi gambar mengikuti target lubang frame
+                    const drawH = targetH;
+                    // Lebar otomatis mengikuti bentuk rasio asli hp-nya (biar ramping dan tidak melar)
+                    const drawW = targetH * imgRatio;
+                    
+                    // Taruh pas di tengah-tengah secara horizontal
                     const drawX = targetX + (targetW - drawW) / 2;
-                    const drawY = targetY + (targetH - drawH) / 2;
 
-                    // 1. Lapisan dasar kotak putih bersih polos di area tengah
+                    // 1. Gambar background kotak putih murni
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(targetX, targetY, targetW, targetH);
 
-                    // 2. Menggambar screenshot user MURNI menggunakan resolusi lebar & tinggi aslinya
-                    ctx.drawImage(userImg, drawX, drawY, drawW, drawH);
+                    // 2. Gambar bukti vote dengan tinggi pas dan lebar ramping asli bawaan HP
+                    ctx.drawImage(userImg, drawX, targetY, drawW, drawH);
                     
-                    // 3. Ditimpa dengan bingkai tiket merah utama di depannya
+                    // 3. Ditimpa bingkai tiket merah di depannya
                     ctx.drawImage(frameImg, 0, 0, frameImg.width, frameImg.height);
 
-                    // Cetak nama username di atas selotip merah
+                    // Teks nama
                     const user = usernameInput.value.trim() || '@ARMY';
                     ctx.font = `bold ${frameImg.width * 0.035}px 'Inter', sans-serif`;
                     ctx.fillStyle = '#ffffff'; 
